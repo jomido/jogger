@@ -1,0 +1,15 @@
+{"line": 11, "file": "foo.py", "msg": "Hello"}
+{"line": 11, "file": "bar.py", "msg": "World"}
+This is an errant print statement, an unstructured (bad) log line entry
+
+Here's another plain text one, preceded by a blank line
+{"line": 12, "file": "bar.py", "msg": "Pizza", "tags": ["food"]}
+{"line": 13, "file": "bar.py", "msg": "Avocado", "tags": ["food"]}
+{"line": 14, "file": "bar.py", "msg": "Cheese", "tags": ["food"]}
+{"line": 15, "file": "bar.py", "msg": "Whiskey", "tags": ["drink"]}
+{"line": 11, "file": "foo.py", "msg": "Hello"}
+{"line": 11, "file": "bar.py", "msg": "World"}
+{"line": 22, "file": "foo.py", "msg": "Liver", "tags": ["warn", "food"]}
+{"line": 43, "file": "bar.py", "msg": "Onions", "tags": ["err", "food"]}
+{"line": "woops","file": "foo.py", "msg": "Bazinga"}
+{"msg": "All is well."}
