@@ -1,4 +1,4 @@
-<img style="float: right;" alt="" src="shoes.jpg"></img>
+<img style="float: right;" alt="" src="shoes.jpg"/>
 
 Jog, don't slog. Slogging through disparate logs gets tedious. jogger provides a common API to navigate through different logs. It's an experiment. I use it.
 
