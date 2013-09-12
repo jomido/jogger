@@ -34,11 +34,10 @@ def test(reader, parser, Klass):
     for attr in expected_attrs:
         assert(attr in log.attributes)
 
-    # print log.line()
     # return
     assert log.line() == [0, NoValue, 'what?']
     assert log.file() == ['', 'foo.py']
-    assert log.msg() == [None, 'Hello']
+    assert log.msg() == ['Hello', None]
     assert log.unparsed() == ['', '        bad line']
     assert log.tags() == ['farewell-ings', 'greetings', 'shazzam']
 
@@ -106,14 +105,7 @@ def test(reader, parser, Klass):
         'tags': 'greetings',
         'msg': None
     })) == 3
-    assert len(log
-        ({
-            'tags': 'greetings'
-        })
-        ({
-            'msg': None
-        })
-    ) == 3
+    assert len(log({'tags': 'greetings'})({'msg': None})) == 3
 
     # using all and any on an attribute
 
@@ -146,7 +138,7 @@ def test(reader, parser, Klass):
     assert log.current() == log[0]
 
     try:
-        print log.previous()
+        log.previous()
     except Exception as ex:
         assert isinstance(ex, Klass.OutOfBoundsError)
 

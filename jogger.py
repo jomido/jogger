@@ -333,7 +333,7 @@ class APIMixin(list):
             for line in self:
                 [vector.add(t) for t in getattr(line, name)]
 
-            return sorted(vector)
+            return sorted(vector, key=self._get_sort_key)
 
         mode = kwargs.pop('mode', 'any')
 
@@ -367,10 +367,14 @@ class APIMixin(list):
 
         return self.__class__(set(lines))
 
+    def _get_sort_key(self, obj):
+
+        return str(obj)
+
     def _scalar(self, name, *selection, **kwargs):
 
         if not selection:
-            return sorted(set([getattr(line, name) for line in self]))
+            return sorted(set([getattr(line, name) for line in self]), key=self._get_sort_key)
 
         mode = kwargs.pop('mode', 'any')
 
@@ -454,6 +458,10 @@ class APIMixin(list):
 
     def __getslice__(self, i, j):
 
+        # this special method is gone in py 3.x; detect a slice object in
+        # __getitem__ for py 3 instead (py 2.x code will still call this
+        # special method)
+
         return self.__class__(
             list.__getslice__(self, i, j),
                 *self._args,
@@ -465,6 +473,13 @@ class APIMixin(list):
         if type(item) in (unicode, str, bytes) or issubclass(
             type(item), basestring):
             return getattr(self, item)
+
+        if type(item) == slice:
+            return self.__class__(
+                list.__getitem__(self, item),
+                    *self._args,
+                    **self._kwargs
+                )
 
         return list.__getitem__(self, item)
 
@@ -563,6 +578,13 @@ class PositionalLog(object):
 from functools import partial
 import collections
 import types
+
+try:
+    types.ClassType = types.ClassType
+    types.TypeType = types.TypeType
+except AttributeError:
+    types.ClassType = type
+    types.TypeType = type
 
 class Jogger(object):
 
