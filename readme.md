@@ -13,7 +13,7 @@ Jog, don't slog. Slogging through disparate logs gets tedious. jogger provides a
 <Log: 1000 lines>
 
 >>> log.attributes
-['timestamp', level', 'msg']
+['timestamp', 'level', 'msg']
 
 >>> log.level()
 ['ERROR', 'INFO', 'DEBUG']
@@ -700,11 +700,12 @@ jog = Jogger(reader=reader, chunker=None, parser=parser).jog
 
 import cx_Oracle
 conn = cx_Oracle.Connection('some_user/some_password@some_db')
-sql = \"""
+sql = """
     SELECT code, type, ship_date
     FROM order_log
     WHERE employee = :employee_name
-    AND ship_date >= sysdate - 100\"""
+    AND ship_date >= sysdate - 100
+"""
 params = {'employee_name': 'jon.dobson'}
 
 log = jog(conn.cursor(), sql, params)
@@ -754,7 +755,7 @@ You can move the marker forward:
 >>> log.current() == log[1]
 True
 
->>> log.position() == 0
+>>> log.position() == 1
 True
 ```
 
