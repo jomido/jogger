@@ -271,19 +271,19 @@ Oh, some are empty.
 There they are. Another way to get at those three missing lines is this:
 
 ```python
->>> log.file('foo.py', 'bar.py', mode='none')
+>>> log.file.none('foo.py', 'bar.py')
 <Log: 3 lines>
 ```
 
-Each attribute method call can also accept an optional 'mode' keyword parameter. It defaults to 'any'. Here's what they mean:
+Each attribute method call can also be dot-suffixed with a mode. Here's what each means:
 
-* 'any': get the log lines where any of the arguments equal the attribute, if the attribute is a single value (a scalar). If the attribute is an iterable (a vector), get the log lines where any of the arguments are in the attribute.
+* any: get the log lines where any of the arguments equal the attribute, if the attribute is a single value (a scalar). If the attribute is an iterable (a vector), get the log lines where any of the arguments are in the attribute.
 
-* 'none':  get the log lines where none of the arguments equal the scalar attribute. Get the log lines where none of the arguments are in the vector attribute.
+* none:  get the log lines where none of the arguments equal the scalar attribute. Get the log lines where none of the arguments are in the vector attribute.
 
-* 'all': get the log lines where all of the arguments are in the vector attribute.
+* all: get the log lines where all of the arguments are in the vector attribute.
 
-* 'only': get the log lines where all of the arguments are in the vector attribute, and the vector attribute _only_ has those arguments.
+* only: get the log lines where all of the arguments are in the vector attribute, and the vector attribute _only_ has those arguments.
 
 The last two modes only make sense for attributes that are iterables (or vectors). The "tags" key in test.log is an iterable (a list):
 
@@ -296,23 +296,14 @@ The last two modes only make sense for attributes that are iterables (or vectors
 >>> log.tags('food', 'drink')
 <Log: 6 lines>
 
->>> log.tags('food', 'warn', mode='all')
-<Log: 1 lines>
->>> log.tags('food', 'warn', mode='none')
-<Log: 9 lines>
->>> log.tags('food', 'warn', mode='only')
-<Log: 1 lines>
->>> log.tags('food', 'warn', mode='any')
-<Log: 5 lines>
-```
-
-Tsk - that's a lot of typing. To save you from having to type (some of the) quotes at the REPL, these modes are all available on the attribute methods themselves (output not shown):
-
-```python
 >>> log.tags.all('food', 'warn')
+<Log: 1 lines>
 >>> log.tags.none('food', 'warn')
+<Log: 9 lines>
 >>> log.tags.only('food', 'warn')
+<Log: 1 lines>
 >>> log.tags.any('food', 'warn')
+<Log: 5 lines>
 ```
 
 That is a _human-friendly_  way to query the log. A machine might only know attribute names and modes as strings. Let's be kind to machines (these are equivalent to the previous four):
