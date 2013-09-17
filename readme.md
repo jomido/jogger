@@ -1,6 +1,8 @@
 
 <div style="float: right;"><img src="shoes.jpg"/></div>
 
+**0.1.1** [*16 Sep 2013*]
+
 Jog, don't slog. Slogging through disparate logs gets tedious. jogger provides a common API to navigate through different logs. It's an experiment. I use it.
 
 ## A Snapshot
@@ -25,6 +27,14 @@ Jog, don't slog. Slogging through disparate logs gets tedious. jogger provides a
 ```
 
 But of course there's more.
+
+## Installing It
+
+There's no pip (or PyPI) support yet, but that's in the works. You can download source and do:
+
+```
+> python setup.py install
+```
 
 ## In a Nutshell
 
@@ -816,9 +826,48 @@ log.some_extra_functionality()
 
 ## Cataloging
 
-If you've got lots of different kinds of logs to explore, you'll have a bunch of different parser functions stored somewhere. Some of the log parsing tools out there rely on regex repositories for different log types. You can do this too. It might be handy to keep a set of common log parser functions included with the jogger project. An attempt to do that may happen.
+If you've got lots of different kinds of logs to explore, you'll have a bunch of different parser functions stored somewhere. Some of the log parsing tools out there rely on regex repositories for different log types. You can do this too. It might be handy to keep a set of common log parser functions included with the jogger project. An attempt to do that may [edit: *has*] happen(ed).
 
-In the meantime, if you've got some handy parsers available, please feel free to contribute them to this project.
+A jog catalogue (a jogalog?) is now available at jogger.catalogue. Two joggers have been added to it. One for the [Common Log Format](http://en.wikipedia.org/wiki/Common_Log_Format) as used by popular web servers (Apache, nginx, etc.) and another for the [Combined Log Format](http://httpd.apache.org/docs/2.4/logs.html). (jogger.catalogue.common_jog and jogger.catalogue.combined_jog respectively.) Additionally, the json-based jogger demonstrated throughout this document is available as jogger.catalogue.json_jogger.
+
+```python
+>>> from jogger.catalogue import common_jog as jog
+>>> log = jog('my_common_log.log')
+>>> log
+<Log: 14566 lines>
+
+>>> from jogger.catalogue import combined_jog as jog
+>>> log = jog('my_combined_log.log')
+>>> log
+<Log: 4988 lines>
+```
+
+Both of these joggers have been built on a regex parser that you can use on your own (knowledge of regexes required, of course). Assuming a simple log with lines like this:
+
+> [10/Oct/2000:13:55:36 -0700] "user foo logged in"
+
+...one could use the regex parser like so:
+
+```python
+>>> from jogger import Jogger
+>>> from jogger.catalogue import regex_parser
+>>> regex = '[(.*?)\] "(.*?)"'
+>>> field_map = [
+        ('timestamp', lambda x: datetime.strptime(x.split(' ')[0], '%d/%b/%Y:%H:%M:%S')),
+        ('message', lambda x: x)
+    ]
+>>> parser = partial(regex_parser, regex, field_map)
+>>> jog = Jogger(parser=parser).jog
+>>> log = jog('my_simple_log.log')
+>>> log.attributes
+['timestamp', 'message']
+>>> log[0].timestamp
+datetime.datetime(2000, 10, 10, 13, 55, 36)
+>>> log[0].message
+user foo logged in
+```
+
+There are more "advanced" concepts involved in this example - such as [functools.partial](http://doughellmann.com/2008/04/pymotw-functools.html) and [regexes](http://www.marksanborn.net/howto/learning-regular-expressions-for-beginners-the-basics/) - but that's what the Internet is for!
 
 ## Other Thoughts
 

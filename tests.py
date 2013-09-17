@@ -155,7 +155,7 @@ def test(reader, parser, Klass):
 
 def run_tests():
 
-    from jogger import PositionalLog, reader, chunker, parser
+    from jogger import PositionalLog, parser
 
     class MyLog(PositionalLog):
 
@@ -166,6 +166,9 @@ def run_tests():
         parser,
         MyLog
     )
+
+    from jogger.catalogue import _tests
+    _tests()
 
 if __name__ == "__main__":
 
