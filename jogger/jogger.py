@@ -557,7 +557,7 @@ class PositionalLog(object):
 
         self._position += 1
         if self._position > len(self):
-            self._position == len(self)
+            self._position = len(self)
 
         return self.current()
 
@@ -565,7 +565,7 @@ class PositionalLog(object):
 
         self._position -= 1
         if self._position < -1:
-            self._position == -1
+            self._position = -1
 
         return self.current()
 
