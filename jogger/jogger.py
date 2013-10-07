@@ -1,16 +1,22 @@
+import collections
+import json
+import re
+import types
+from collections import defaultdict
+from functools import partial
+
 
 try:
 
-  unicode = unicode
+    unicode = unicode
 
 except NameError:
 
-  unicode = str
-  basestring = (str, bytes)
+    unicode = str
+    basestring = (str, bytes)
 
 
 def reader(file_name):
-
     """
     Get a blob of data from somewhere
     """
@@ -20,7 +26,6 @@ def reader(file_name):
 
 
 def chunker(blob):
-
     """
     Chunk a blob of data into an iterable of smaller chunks
     """
@@ -28,9 +33,7 @@ def chunker(blob):
     return [chunk for chunk in blob.split('\n') if chunk.strip()]
 
 
-import json
 def parser(chunks):
-
     """
     Parse a data chunk into a dictionary; catch failures and return suitable
     defaults
@@ -49,7 +52,6 @@ def parser(chunks):
 
 
 def buncher(line_class, dictionaries):
-
     """
     Turn an iterable of dictionaries into an iterable of Python objects that
     represent log lines.
@@ -58,7 +60,6 @@ def buncher(line_class, dictionaries):
     return [line_class(dictionary) for dictionary in dictionaries]
 
 
-from collections import defaultdict
 def inspector(objects):
 
     api = {
@@ -73,10 +74,10 @@ def inspector(objects):
         for attribute in dir(line):
             if not attribute.startswith('_') and not callable(
                     getattr(line, attribute)
-                ):
+            ):
                 kind = type(getattr(line, attribute))
                 if kind in (unicode, basestring, bytes) or issubclass(
-                    kind, basestring):
+                        kind, basestring):
                     kind = str
                 attributes[attribute].add(kind)
 
@@ -94,7 +95,7 @@ def inspector(objects):
                 api['defaults'][attribute] = NoValue
 
             if not issubclass(kind, collections.Iterable) or kind in (
-                str, unicode, basestring, bytes):
+                    str, unicode, basestring, bytes):
                 api['scalars'].add(attribute)
             else:
                 api['vectors'].add(attribute)
@@ -108,7 +109,7 @@ def inspector(objects):
             for kind in kinds:
 
                 if not issubclass(kind, collections.Iterable) or kind in (
-                    str, unicode, basestring, bytes):
+                        str, unicode, basestring, bytes):
                     has_scalars = True
                 else:
                     has_vectors = True
@@ -118,12 +119,10 @@ def inspector(objects):
             else:
                 api['vectors'].add(attribute)
 
-
     return api
 
 
 def patcher(APIMixin, LogKlass, api):
-
     """
     Merge the api mixin class with a user Log class and patch in an api; also
     set defaults
@@ -143,10 +142,10 @@ def patcher(APIMixin, LogKlass, api):
                     api['defaults'][a] = default_value
                     kind = type(default_value)
                     if kind in (unicode, basestring, bytes) or issubclass(
-                        kind, basestring):
+                            kind, basestring):
                         kind = str
                     if not issubclass(kind, collections.Iterable) or kind in (
-                        str, unicode, basestring):
+                            str, unicode, basestring):
                         api['scalars'].add(a)
                     else:
                         api['vectors'].add(a)
@@ -156,44 +155,52 @@ def patcher(APIMixin, LogKlass, api):
             for scalar in api['scalars']:
 
                 value = partial(lambda self, scalar, *args, **kwargs:
-                    self._scalar(scalar, *args, **kwargs), self, scalar
-                )
+                                self._scalar(
+                                    scalar, *args, **kwargs), self, scalar
+                                )
                 setattr(self, scalar, value)
 
                 value.any = value
 
                 value.all = partial(lambda self, scalar, *args:
-                    self._scalar(scalar, *args, mode='all'), self, scalar
-                )
+                                    self._scalar(
+                                        scalar, *args, mode='all'), self, scalar
+                                    )
 
                 value.none = partial(lambda self, scalar, *args:
-                    self._scalar(scalar, *args, mode='none'), self, scalar
-                )
+                                     self._scalar(
+                                         scalar, *args, mode='none'), self, scalar
+                                     )
 
                 value.only = partial(lambda self, vector, *args:
-                    self._scalar(scalar, *args, mode='only'), self, scalar
-                )
+                                     self._scalar(
+                                         scalar, *args, mode='only'), self, scalar
+                                     )
 
             for vector in api['vectors']:
 
                 value = partial(lambda self, vector, *args, **kwargs:
-                    self._vector(vector, *args, **kwargs), self, vector
-                )
+                                self._vector(
+                                    vector, *args, **kwargs), self, vector
+                                )
                 setattr(self, vector, value)
 
                 value.any = value
 
                 value.all = partial(lambda self, vector, *args:
-                    self._vector(vector, *args, mode='all'), self, vector
-                )
+                                    self._vector(
+                                        vector, *args, mode='all'), self, vector
+                                    )
 
                 value.none = partial(lambda self, vector, *args:
-                    self._vector(vector, *args, mode='none'), self, vector
-                )
+                                     self._vector(
+                                         vector, *args, mode='none'), self, vector
+                                     )
 
                 value.only = partial(lambda self, vector, *args:
-                    self._vector(vector, *args, mode='only'), self, vector
-                )
+                                     self._vector(
+                                         vector, *args, mode='only'), self, vector
+                                     )
 
             for line in self:
                 for attribute, default in api['defaults'].items():
@@ -208,12 +215,16 @@ def patcher(APIMixin, LogKlass, api):
 
 
 class MetaNoValue(type):
+
     def __bool__(cls):
         return False
+
     def __nonzero__(cls):
         return False
+
     def __getattr__(cls, attr):
         return cls
+
 
 class NoValue(object):
     __metaclass__ = MetaNoValue
@@ -244,7 +255,6 @@ class Log(object):
     """
 
 
-import re
 PATTERN_TYPE = type(re.compile('a'))
 
 
@@ -319,7 +329,8 @@ class APIMixin(list):
                 continue
 
             if callable(comparator):
-                log = self.__class__([line for line in log if comparator(line)])
+                log = self.__class__(
+                    [line for line in log if comparator(line)])
                 continue
 
             raise TypeError("Invalid comparator")
@@ -340,7 +351,7 @@ class APIMixin(list):
         selection = set(selection)
         lines = []
 
-        for i, line in enumerate(self):
+        for line in self:
             passes = []
             value = getattr(line, name)
             for select in selection:
@@ -374,7 +385,10 @@ class APIMixin(list):
     def _scalar(self, name, *selection, **kwargs):
 
         if not selection:
-            return sorted(set([getattr(line, name) for line in self]), key=self._get_sort_key)
+            return (
+                sorted(set([getattr(line, name)
+                       for line in self]), key=self._get_sort_key)
+            )
 
         mode = kwargs.pop('mode', 'any')
 
@@ -421,10 +435,10 @@ class APIMixin(list):
                         return True
         else:
             if select in (str, unicode, basestring, bytes) or issubclass(
-                select, basestring):
+                    select, basestring):
                 select = str
             if type(value) in (str, unicode, basestring, bytes) or issubclass(
-                type(value), basestring):
+                    type(value), basestring):
                 value = str(value)
             if isinstance(value, select):
                 return True
@@ -436,7 +450,7 @@ class APIMixin(list):
         else:
             invalid = (types.ClassType, types.TypeType, MetaNoValue)
             if type(select) not in invalid:
-                if type(select) == PATTERN_TYPE:
+                if isinstance(select, PATTERN_TYPE):
                     if select.match(value):
                         return True
                 elif callable(select):
@@ -444,10 +458,10 @@ class APIMixin(list):
                         return True
             else:
                 if select in (str, unicode, basestring, bytes) or issubclass(
-                    select, basestring):
+                        select, basestring):
                     select = str
                 if type(value) in (str, unicode, basestring, bytes) or issubclass(
-                    type(value), basestring):
+                        type(value), basestring):
                     value = str(value)
                 if isinstance(value, select):
                     return True
@@ -464,29 +478,29 @@ class APIMixin(list):
 
         return self.__class__(
             list.__getslice__(self, i, j),
-                *self._args,
-                **self._kwargs
-            )
+            *self._args,
+            **self._kwargs
+        )
 
     def __getitem__(self, item):
 
         if type(item) in (unicode, str, bytes) or issubclass(
-            type(item), basestring):
+                type(item), basestring):
             return getattr(self, item)
 
-        if type(item) == slice:
+        if isinstance(item, slice):
             return self.__class__(
                 list.__getitem__(self, item),
-                    *self._args,
-                    **self._kwargs
-                )
+                *self._args,
+                **self._kwargs
+            )
 
         return list.__getitem__(self, item)
 
     def __setitem__(self, item, value):
 
         if type(item) in (unicode, str, bytes) or issubclass(
-            type(item), basestring):
+                type(item), basestring):
             setattr(self, item, value)
             return
 
@@ -524,7 +538,8 @@ class APIMixin(list):
 
 class PositionalLog(object):
 
-    class OutOfBoundsError(Exception): pass
+    class OutOfBoundsError(Exception):
+        pass
 
     def __init__(self, lines, *args, **kwargs):
 
@@ -575,10 +590,6 @@ class PositionalLog(object):
         return self._position
 
 
-from functools import partial
-import collections
-import types
-
 try:
     types.ClassType = types.ClassType
     types.TypeType = types.TypeType
@@ -586,33 +597,33 @@ except AttributeError:
     types.ClassType = type
     types.TypeType = type
 
+
 class Jogger(object):
 
     def __init__(self, reader=reader, chunker=chunker, parser=parser,
                  buncher=buncher, inspector=inspector, patcher=patcher,
                  line=Line, log=Log, api=APIMixin):
 
-        self.read       = reader
-        self.chunk      = chunker
-        self.parse      = parser
-        self.bunch      = partial(buncher, line)
-        self.inspect    = inspector
-        self.klass      = log
-        self.patch      = partial(patcher, api, log)
+        self.read = reader
+        self.chunk = chunker
+        self.parse = parser
+        self.bunch = partial(buncher, line)
+        self.inspect = inspector
+        self.klass = log
+        self.patch = partial(patcher, api, log)
 
     def jog(self, *args, **kwargs):
-
         """
         This method returns an instance of a patched-together Log class
         """
 
-        blob    = self.read(*args, **kwargs)
-        chunks  = self.chunk(blob) if self.chunk else blob
-        dicts   = self.parse(chunks) if self.parse else chunks
+        blob = self.read(*args, **kwargs)
+        chunks = self.chunk(blob) if self.chunk else blob
+        dicts = self.parse(chunks) if self.parse else chunks
         objects = self.bunch(dicts) if self.bunch else dicts
-        api     = self.inspect(objects)
-        klass   = self.patch(api)
-        log     = klass(objects, *args, **kwargs)
+        api = self.inspect(objects)
+        klass = self.patch(api)
+        log = klass(objects, *args, **kwargs)
 
         return log
 
