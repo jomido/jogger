@@ -519,10 +519,7 @@ class APIMixin(list):
 
     def __eq__(self, other):
 
-        return (
-            set([hash(line) for line in self]) ==
-            set([hash(line) for line in other])
-        )
+        return set(map(hash, self)) == set(map(hash, other))
 
     def __repr__(self):
 
