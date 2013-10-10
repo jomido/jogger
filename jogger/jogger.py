@@ -43,7 +43,7 @@ def parser(chunks):
     for chunk in chunks:
         try:
             dictionaries.append(json.loads(chunk))
-        except:
+        except ValueError:
             dictionaries.append({
                 'unparsed': chunk
             })
