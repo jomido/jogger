@@ -154,53 +154,45 @@ def patcher(APIMixin, LogKlass, api):
 
             for scalar in api['scalars']:
 
-                value = partial(lambda self, scalar, *args, **kwargs:
-                                self._scalar(
-                                    scalar, *args, **kwargs), self, scalar
-                                )
+                value = partial(
+                    lambda self, scalar, *args, **kwargs: self._scalar(
+                        scalar, *args, **kwargs), self, scalar)
                 setattr(self, scalar, value)
 
                 value.any = value
 
-                value.all = partial(lambda self, scalar, *args:
-                                    self._scalar(
-                                        scalar, *args, mode='all'), self, scalar
-                                    )
+                value.all = partial(
+                    lambda self, scalar, *args: self._scalar(
+                        scalar, *args, mode='all'), self, scalar)
 
-                value.none = partial(lambda self, scalar, *args:
-                                     self._scalar(
-                                         scalar, *args, mode='none'), self, scalar
-                                     )
+                value.none = partial(
+                    lambda self, scalar, *args: self._scalar(
+                        scalar, *args, mode='none'), self, scalar)
 
-                value.only = partial(lambda self, vector, *args:
-                                     self._scalar(
-                                         scalar, *args, mode='only'), self, scalar
-                                     )
+                value.only = partial(
+                    lambda self, vector, *args: self._scalar(
+                        scalar, *args, mode='only'), self, scalar)
 
             for vector in api['vectors']:
 
-                value = partial(lambda self, vector, *args, **kwargs:
-                                self._vector(
-                                    vector, *args, **kwargs), self, vector
-                                )
+                value = partial(
+                    lambda self, vector, *args, **kwargs: self._vector(
+                        vector, *args, **kwargs), self, vector)
                 setattr(self, vector, value)
 
                 value.any = value
 
-                value.all = partial(lambda self, vector, *args:
-                                    self._vector(
-                                        vector, *args, mode='all'), self, vector
-                                    )
+                value.all = partial(
+                    lambda self, vector, *args: self._vector(
+                        vector, *args, mode='all'), self, vector)
 
-                value.none = partial(lambda self, vector, *args:
-                                     self._vector(
-                                         vector, *args, mode='none'), self, vector
-                                     )
+                value.none = partial(
+                    lambda self, vector, *args: self._vector(
+                        vector, *args, mode='none'), self, vector)
 
-                value.only = partial(lambda self, vector, *args:
-                                     self._vector(
-                                         vector, *args, mode='only'), self, vector
-                                     )
+                value.only = partial(
+                    lambda self, vector, *args: self._vector(
+                        vector, *args, mode='only'), self, vector)
 
             for line in self:
                 for attribute, default in api['defaults'].items():
@@ -301,7 +293,8 @@ class APIMixin(list):
 
                         v = d[k]
 
-                        if isinstance(v, collections.Iterable) and not isinstance(v, (str, unicode)):
+                        if (isinstance(v, collections.Iterable) and
+                                not isinstance(v, (str, unicode))):
                             method = self._vector_match
                         else:
                             method = self._scalar_match
