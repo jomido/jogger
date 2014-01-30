@@ -1,4 +1,3 @@
-
 <div style="float: right;"><img src="shoes.jpg"/></div>
 
 **0.1.1** [*16 Sep 2013*]
@@ -535,7 +534,7 @@ To create the jogger, use the Jogger class:
 
 ```python
 from jogger import Jogger
-jogger = Jogger(parser=parser).jog
+jog = Jogger(parser=parser).jog
 log = jog('my.log')
 ```
 
